@@ -3,11 +3,13 @@ import type { RegistryType } from '../../../types/host-rules.ts';
 import * as hostRules from '../../../util/host-rules.ts';
 import type { Timestamp } from '../../../util/timestamp.ts';
 import type { Release } from '../types.ts';
+import { getArtifactoryTagTimestamps } from './artifactory.ts';
 import { dockerDatasourceId } from './common.ts';
 import { getGitlabTagTimestamps } from './gitlab.ts';
 import type { RegistryTimestampsFetcher } from './types.ts';
 
 const fetchers: Record<RegistryType, RegistryTimestampsFetcher> = {
+  artifactory: getArtifactoryTagTimestamps,
   gitlab: getGitlabTagTimestamps,
 };
 

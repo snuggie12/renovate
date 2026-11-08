@@ -40,6 +40,7 @@ describe('util/host-rules', () => {
       insecureRegistry: true,
       registryType: true,
       registryApiUrl: true,
+      artifactoryRepoKey: true,
       timeout: true,
       abortOnError: true,
       abortIgnoreStatusCodes: true,

@@ -2355,6 +2355,32 @@ Supported artifactAuth and hostType combinations:
 | ------------ | ------------------------------------------- |
 | `composer`   | `gitlab`, `packagist`, `github`, `git-tags` |
 
+### `hostRules.artifactoryRepoKey`
+
+The [Artifactory repository key](https://jfrog.com/help/r/jfrog-artifactory-documentation/repository-management) that stores the images of a [`registryType=artifactory`](#hostrulesregistrytype) registry.
+
+Renovate reads release timestamps from `<registryApiUrl>/api/storage/<artifactoryRepoKey>/<image>`.
+Without this option, Renovate guesses the repository key: first from the first path segment of the image (the repository path access method), then from the first label of the registry hostname (the subdomain access method).
+Set it when neither guess is right, for example when a reverse proxy serves each repository from its own hostname:
+
+```json
+{
+  "hostRules": [
+    {
+      "matchHost": "helm.example.com",
+      "registryType": "artifactory",
+      "artifactoryRepoKey": "helm-oci",
+      "registryApiUrl": "https://artifactory.example.com/artifactory"
+    },
+    {
+      "matchHost": "artifactory.example.com",
+      "username": "renovate",
+      "password": "{{ secrets.ARTIFACTORY_PASSWORD }}"
+    }
+  ]
+}
+```
+
 ### `hostRules.authType`
 
 You may use the `authType` option to create a custom HTTP `authorization` header.
@@ -2608,9 +2634,13 @@ Each `registryType` has a default:
 
 | `registryType` | Default API base URL                                                                      |
 | -------------- | ----------------------------------------------------------------------------------------- |
+| `artifactory`  | The registry host with `/artifactory` appended                                            |
 | `gitlab`       | `https://gitlab.com/api/v4` for `registry.gitlab.com`, else the registry host + `/api/v4` |
 
 You usually need this for self-managed GitLab, where the registry and the GitLab API are served from different hosts.
+For Artifactory, set it when the API is served from a different host or path than the registry.
+
+Requests to the API use the host rules that match the API URL, so set credentials on a host rule for the API host when it differs from the registry host.
 
 ### `hostRules.registryType`
 
@@ -2621,6 +2651,7 @@ This lets features like [`minimumReleaseAge`](#minimumreleaseage) work for image
 
 Supported values:
 
+- `artifactory`: JFrog Artifactory. Renovate lists the tag folders with the [storage API](https://jfrog.com/help/r/jfrog-rest-apis/file-list). The release timestamp is the `lastModified` time of each tag's manifest. See [`artifactoryRepoKey`](#hostrulesartifactoryrepokey) for how Renovate finds the repository
 - `gitlab`: GitLab container registry. Renovate reads each tag's `publishedAt` time with the GitLab API. Requests use `gitlab` host rules that match the API URL, so an existing token for your GitLab platform also works here
 
 `registry.gitlab.com` is detected automatically, so it does not need this option.
@@ -2629,6 +2660,12 @@ If the registry's API fails, Renovate still returns the tags, but without releas
 ```json
 {
   "hostRules": [
+    {
+      "matchHost": "artifactory.example.com",
+      "registryType": "artifactory",
+      "username": "renovate",
+      "password": "{{ secrets.ARTIFACTORY_PASSWORD }}"
+    },
     {
       "matchHost": "registry.gitlab.example.com",
       "registryType": "gitlab",

@@ -2595,7 +2595,7 @@ describe('config/validation', () => {
         {
           topic: 'Configuration Error',
           message:
-            'Invalid hostRules[1].registryType: registryType had a value `"harbour"` which was not part of the allowedValues: ["gitlab"]',
+            'Invalid hostRules[1].registryType: registryType had a value `"harbour"` which was not part of the allowedValues: ["artifactory","gitlab"]',
         },
       ]);
       expect(warnings).toEqual([]);

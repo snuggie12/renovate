@@ -1,4 +1,4 @@
-export type RegistryType = 'gitlab';
+export type RegistryType = 'artifactory' | 'gitlab';
 
 export interface HostRule {
   authType?: string;
@@ -8,6 +8,7 @@ export interface HostRule {
   insecureRegistry?: boolean;
   registryType?: RegistryType;
   registryApiUrl?: string;
+  artifactoryRepoKey?: string;
   timeout?: number;
   abortOnError?: boolean;
   abortIgnoreStatusCodes?: number[];
